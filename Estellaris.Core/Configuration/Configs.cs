@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration.Memory;
 namespace Estellaris.Core {
   public class Configs {
     static bool _isLoaded { get; set; }
-    protected static IConfiguration Configuration { get; private set; }
+    public static IConfigurationRoot Configuration { get; private set; }
     public static string Environment { get; protected set; } = "dev";
     public static string BasePath { get; protected set; } = Directory.GetCurrentDirectory();
 
