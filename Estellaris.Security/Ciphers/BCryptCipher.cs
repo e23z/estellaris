@@ -6,7 +6,7 @@ namespace Estellaris.Security.Ciphers {
     /// <param name="str">String to be hashed.</param>
     /// <returns>Base64 string of the hashed input.</returns>
     public static string Hash(string str) {
-      return BCrypt.Net.BCrypt.HashPassword(str, BCrypt.Net.BCrypt.GenerateSalt());
+      return BCrypt.Net.BCrypt.HashPassword(str, BCrypt.Net.BCrypt.GenerateSalt(10, 'y'));
     }
 
     /// <summary>
