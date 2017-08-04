@@ -11,7 +11,6 @@ namespace Estellaris.Core.DI {
     static DependenciesProvider _instance { get; set; }
     static IServiceProvider _serviceProvider { get; set; }
     static readonly ICollection<DependencyInfo> _interfaceImplementations = new Collection<DependencyInfo>();
-    internal static ICollection<DependencyInfo> InterfaceImplementations { get { return _interfaceImplementations; } }
 
     public static DependenciesProvider AddScopedFromAssemblies(Func<AssemblyName, bool> filters) {
       return AddFromAssemblies(filters, DependencyScope.Scoped);
