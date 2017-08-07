@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Estellaris.EF {
   public static class Mapper {
-    //TODO: Add Tests
     static readonly ICollection<MappingInfo> _mappings = new Collection<MappingInfo>();
 
     public static void RegisterAllFromAssembly(Assembly assembly, ModelBuilder modelBuilder) {

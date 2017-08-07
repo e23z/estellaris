@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Estellaris.EF.Interfaces {
   public interface IBaseRepository<T> : IDisposable {
+    int Count();
     int Count(Func<T, bool> predicate);
+    Task<int> CountAsync();
     Task<int> CountAsync(Expression<Func<T, bool>> predicate);
     void Delete(Func<T, bool> predicate);
     void DeleteAsync(Func<T, bool> predicate);

@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="../Estellaris.Security/Estellaris.Security.csproj" />
     <ProjectReference Include="../Estellaris.Core/Estellaris.Core.csproj" />
+    <ProjectReference Include="../Estellaris.EF/Estellaris.EF.csproj" />
   </ItemGroup>
 
   <ItemGroup>

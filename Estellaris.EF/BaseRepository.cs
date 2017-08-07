@@ -25,6 +25,14 @@ namespace Estellaris.EF {
       return DbSet.AsNoTracking().CountAsync(predicate);
     }
 
+    public virtual int Count() {
+      return DbSet.AsNoTracking().Count();
+    }
+    
+    public virtual Task<int> CountAsync() {
+      return DbSet.AsNoTracking().CountAsync();
+    }
+
     public virtual void Delete(Func<T, bool> predicate) {
       Transaction(() => {
         DbContext.RemoveRange(DbSet.Where(predicate));

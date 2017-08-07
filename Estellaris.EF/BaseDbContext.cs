@@ -21,6 +21,8 @@ namespace Estellaris.EF {
       }
     }
 
+    public BaseDbContext(DbContextOptions options) : base(options) { }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
       base.OnModelCreating(modelBuilder);
       Mapper.RegisterAllFromAssembly(GetMappingAssembly(), modelBuilder);
