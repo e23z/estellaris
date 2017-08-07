@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Estellaris.Tests {
   [TestClass]
   public class ConfigsTests {
-     [TestMethod]
+    [TestMethod]
     public void TestEnvironment() {
       Configs.Init(environment: "invalid");
       Assert.IsNull(Configs.GetValue<string>("EnvName"));
@@ -152,7 +151,7 @@ namespace Estellaris.Tests {
       Assert.AreEqual(new DirectoryInfo(relativeDirPath).FullName, relativeDir.FullName);
       Assert.IsTrue(Directory.Exists(relativeDirPath));
       Configs.Dispose();
-    } 
+    }
 
     internal class MyOptions {
       public int IntValue { get; set; }

@@ -23,11 +23,20 @@ namespace Estellaris.Core.DI {
     public static DependenciesProvider AddSingletonFromAssemblies(Func<AssemblyName, bool> filters) {
       return AddFromAssemblies(filters, DependencyScope.Singleton);
     }
+    
+    public static DependenciesProvider AddScopedFromAssemblies(IEnumerable<Assembly> assemblies) {
+      return AddFromAssemblies(assemblies, DependencyScope.Scoped);
+    }
+
+    public static DependenciesProvider AddTransientFromAssemblies(IEnumerable<Assembly> assemblies) {
+      return AddFromAssemblies(assemblies, DependencyScope.Transient);
+    }
+
+    public static DependenciesProvider AddSingletonFromAssemblies(IEnumerable<Assembly> assemblies) {
+      return AddFromAssemblies(assemblies, DependencyScope.Singleton);
+    }
 
     static DependenciesProvider AddFromAssemblies(Func<AssemblyName, bool> filters, DependencyScope scope) {
-      if (_instance == null)
-        _instance = new DependenciesProvider();
-
       var rootAssembly = Assembly.GetEntryAssembly();
       var assemblies = rootAssembly.GetReferencedAssemblies()
         .Where(filters)
@@ -36,6 +45,13 @@ namespace Estellaris.Core.DI {
       if (filters.Invoke(rootAssembly.GetName()))
         assemblies.Add(rootAssembly);
 
+      return AddFromAssemblies(assemblies, scope);
+    }
+
+    static DependenciesProvider AddFromAssemblies(IEnumerable<Assembly> assemblies, DependencyScope scope) {
+      if (_instance == null)
+        _instance = new DependenciesProvider();
+      
       var types = assemblies.SelectMany(_ => _.DefinedTypes).ToList();
       var classes = types.Where(_ => _.IsClass).ToList();
       var interfaces = types.Where(_ => _.IsInterface).ToList();
@@ -132,7 +148,7 @@ namespace Estellaris.Core.DI {
       _serviceProvider = serviceCollection.BuildServiceProvider();
     }
 
-    public T GetService<T>() {
+    public static T GetService<T>() {
       return _serviceProvider != null ? _serviceProvider.GetService<T>() : default(T);
     }
   }
