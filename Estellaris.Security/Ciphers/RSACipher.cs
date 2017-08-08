@@ -1,13 +1,14 @@
+using System.IO;
 using System.Security.Cryptography;
 using Estellaris.Core.Extensions;
 using Estellaris.Security.Utils;
 
 namespace Estellaris.Security.Ciphers {
   public static class RSACipher {
-    public static RSAKeyPair GenerateKeys() {
+    public static RSAKeyPair GenerateKeys(int keySize = 2048) {
       RSAKeyPair keys = null;
       using(var rsa = RSA.Create()) {
-        rsa.KeySize = 2048;
+        rsa.KeySize = keySize;
         var privateKey = PEMExporter.Export(rsa, true);
         var publicKey = PEMExporter.Export(rsa, false);
         keys = new RSAKeyPair(privateKey, publicKey);
@@ -34,7 +35,7 @@ namespace Estellaris.Security.Ciphers {
           var decryptedBytes = rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.Pkcs1);
           decryptedStr = decryptedBytes.ToEncoding();
         }
-      } catch {  }
+      } catch { }
       return decryptedStr;
     }
   }
