@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.RegularExpressions;
 using Estellaris.Core.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,6 +25,15 @@ namespace Estellaris.Tests {
       var comparisonBytes = new byte[] { 116, 101, 115, 116 };
       var bytesFromStr = "dGVzdA==".FromBase64();
       Assert.IsTrue(bytesFromStr.SequenceEqual(comparisonBytes));
+    }
+    
+    [TestMethod]
+    public void TestSubstitute() {
+      var str = "My replaceable text";
+      var replaced = str.Substitute(@"\bREPlaceable\b", "beautiful");
+      var notReplaced = str.Substitute(@"\bREPlaceable\b", "beautiful", RegexOptions.None);
+      Assert.AreEqual(replaced, "My beautiful text");
+      Assert.AreEqual(notReplaced, str);
     }
   }
 }
