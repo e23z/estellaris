@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
 
@@ -10,7 +11,7 @@ namespace Estellaris.Core.DI {
   public class DependenciesProvider {
     static DependenciesProvider _instance { get; set; }
     static IServiceProvider _serviceProvider { get; set; }
-    static readonly ICollection<DependencyInfo> _interfaceImplementations = new Collection<DependencyInfo>();
+    static readonly IServiceCollection _serviceCollection = new ServiceCollection();
 
     public static DependenciesProvider AddScopedFromAssemblies(Func<AssemblyName, bool> filters) {
       return AddFromAssemblies(filters, DependencyScope.Scoped);
@@ -23,7 +24,7 @@ namespace Estellaris.Core.DI {
     public static DependenciesProvider AddSingletonFromAssemblies(Func<AssemblyName, bool> filters) {
       return AddFromAssemblies(filters, DependencyScope.Singleton);
     }
-    
+
     public static DependenciesProvider AddScopedFromAssemblies(IEnumerable<Assembly> assemblies) {
       return AddFromAssemblies(assemblies, DependencyScope.Scoped);
     }
@@ -49,9 +50,12 @@ namespace Estellaris.Core.DI {
     }
 
     static DependenciesProvider AddFromAssemblies(IEnumerable<Assembly> assemblies, DependencyScope scope) {
+      if (_serviceProvider != null)
+        return _instance;
+      
       if (_instance == null)
         _instance = new DependenciesProvider();
-      
+
       var types = assemblies.SelectMany(_ => _.DefinedTypes).ToList();
       var classes = types.Where(_ => _.IsClass).ToList();
       var interfaces = types.Where(_ => _.IsInterface).ToList();
@@ -59,7 +63,19 @@ namespace Estellaris.Core.DI {
       foreach(var _interface in interfaces) {
         var implementation = classes.FirstOrDefault(_ => _.Name == _interface.Name.TrimStart('I'));
         if (implementation != null) {
-          _interfaceImplementations.Add(new DependencyInfo(_interface, implementation, scope));
+          var interfaceType = _interface.Assembly.GetType(_interface.FullName);
+          var implementationType = implementation.Assembly.GetType(implementation.FullName);
+          switch (scope) {
+            case DependencyScope.Scoped:
+              _serviceCollection.AddScoped(interfaceType, implementationType);
+              break;
+            case DependencyScope.Transient:
+              _serviceCollection.AddTransient(interfaceType, implementationType);
+              break;
+            case DependencyScope.Singleton:
+              _serviceCollection.AddSingleton(interfaceType, implementationType);
+              break;
+          }
         }
       }
 
@@ -71,7 +87,10 @@ namespace Estellaris.Core.DI {
     }
 
     public DependenciesProvider AddScoped(Type type, Type implementation) {
-      _interfaceImplementations.Add(new DependencyInfo(type, implementation, DependencyScope.Scoped));
+      if (_serviceProvider != null)
+        return _instance;
+      
+      _serviceCollection.AddScoped(type, implementation);
       return _instance;
     }
 
@@ -90,7 +109,10 @@ namespace Estellaris.Core.DI {
     }
 
     public DependenciesProvider AddTransient(Type type, Type implementation) {
-      _interfaceImplementations.Add(new DependencyInfo(type, implementation, DependencyScope.Transient));
+      if (_serviceProvider != null)
+        return _instance;
+      
+      _serviceCollection.AddTransient(type, implementation);
       return _instance;
     }
 
@@ -109,7 +131,10 @@ namespace Estellaris.Core.DI {
     }
 
     public DependenciesProvider AddSingleton(Type type, Type implementation) {
-      _interfaceImplementations.Add(new DependencyInfo(type, implementation, DependencyScope.Singleton));
+      if (_serviceProvider != null)
+        return _instance;
+
+      _serviceCollection.AddSingleton(type, implementation);
       return _instance;
     }
 
@@ -123,29 +148,25 @@ namespace Estellaris.Core.DI {
       return _instance;
     }
 
+    public DependenciesProvider AddConfig<T>(string key) where T : class {
+      if (_serviceProvider != null)
+        return _instance;
+      
+      if (Configs.Configuration == null)
+        Configs.Init();
+      
+      _serviceCollection.AddOptions().Configure<T>(opts => Configs.Configuration.GetSection(key).Bind(opts));
+      return _instance;
+    }
+
     public IServiceCollection Build(IServiceCollection serviceCollection) {
-      foreach(var interfaceImplemenation in _interfaceImplementations) {
-        switch (interfaceImplemenation.Scope) {
-          case DependencyScope.Scoped:
-            serviceCollection.AddScoped(
-              interfaceImplemenation.Interface, interfaceImplemenation.Implementation);
-            break;
-          case DependencyScope.Transient:
-            serviceCollection.AddTransient(
-              interfaceImplemenation.Interface, interfaceImplemenation.Implementation);
-            break;
-          case DependencyScope.Singleton:
-            serviceCollection.AddSingleton(
-              interfaceImplemenation.Interface, interfaceImplemenation.Implementation);
-            break;
-        }
-      }
+      foreach (var serviceDescriptor in _serviceCollection)
+        serviceCollection.Add(serviceDescriptor);
       return serviceCollection;
     }
 
     public void Build() {
-      var serviceCollection = Build(new ServiceCollection());
-      _serviceProvider = serviceCollection.BuildServiceProvider();
+      _serviceProvider = _serviceCollection.BuildServiceProvider();
     }
 
     public static T GetService<T>() {

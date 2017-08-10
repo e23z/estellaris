@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Estellaris.Core;
 using Estellaris.Core.DI;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Estellaris.Tests {
@@ -22,6 +26,20 @@ namespace Estellaris.Tests {
       Singleton = singleton;
     }
   }
+  internal class MyOptions {
+    public int IntValue { get; set; }
+    public bool BoolValue { get; set; }
+    public string StringValue { get; set; }
+    public DateTime DateTimeValue { get; set; }
+    public IEnumerable<string> StringArray { get; set; }
+    public int[] IntArray { get; set; }
+    public MySubOptions MySubOptions { get; set; }
+  }
+  internal class MySubOptions {
+    public string Option1 { get; set; }
+    public string Option2 { get; set; }
+    public string Option3 { get; set; }
+  }
 
   [TestClass]
   public class DITests {
@@ -32,6 +50,7 @@ namespace Estellaris.Tests {
         .AddTransient<ITransient, ClassTransient>()
         .AddSingleton<ISingleton, ClassSingleton>()
         .AddSingleton<InjectedClass>()
+        .AddConfig<MyOptions>("MyOptions")
         .Build();
     }
 
@@ -60,6 +79,29 @@ namespace Estellaris.Tests {
       Assert.IsNotNull(injected.Singleton);
       Assert.AreSame(singletonOne, injected.Singleton);
       Assert.IsNull(invalid);
+    }
+
+    [TestMethod]
+    public void TestConfigs() {
+      var scopedOne = DependenciesProvider.GetService<IClassScoped>();
+      var intArray = new [] { 1, 2, 3 };
+      var strArray = new [] { "Value1", "Value2" };
+      var model = DependenciesProvider.GetService<IOptions<MyOptions>>().Value;
+
+      Assert.AreEqual(10, model.IntValue);
+      Assert.IsTrue(model.BoolValue);
+      Assert.AreEqual("Test", model.StringValue);
+      Assert.AreEqual(new DateTime(2017, 01, 02, 12, 13, 14), model.DateTimeValue);
+      Assert.IsNotNull(model.StringArray);
+      Assert.AreEqual(2, model.StringArray.Count());
+      Assert.IsTrue(strArray.SequenceEqual(model.StringArray));
+      Assert.IsNotNull(model.IntArray);
+      Assert.AreEqual(3, model.IntArray.Count());
+      Assert.IsTrue(intArray.SequenceEqual(model.IntArray));
+      Assert.IsNotNull(model.MySubOptions);
+      Assert.AreEqual("Lorem", model.MySubOptions.Option1);
+      Assert.AreEqual("Ipsum", model.MySubOptions.Option2);
+      Assert.IsNull(model.MySubOptions.Option3);
     }
   }
 }
