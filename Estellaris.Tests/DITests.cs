@@ -43,10 +43,12 @@ namespace Estellaris.Tests {
 
   [TestClass]
   public class DITests {
+    static DependenciesProvider _factory { get; set; }
+
     [TestInitialize]
     public void InitContainer() {
       var testsAssembly = Assembly.Load(new AssemblyName("Estellaris.Tests"));
-      DependenciesProvider.AddScopedFromAssemblies(new [] { testsAssembly })
+      _factory = DependenciesProvider.Create().AddScopedFromAssemblies(new [] { testsAssembly })
         .AddTransient<ITransient, ClassTransient>()
         .AddSingleton<ISingleton, ClassSingleton>()
         .AddSingleton<InjectedClass>()
@@ -56,14 +58,14 @@ namespace Estellaris.Tests {
 
     [TestMethod]
     public void TestContainer() {
-      var scopedOne = DependenciesProvider.GetService<IClassScoped>();
-      var scopedTwo = DependenciesProvider.GetService<IClassScoped>();
-      var transientOne = DependenciesProvider.GetService<ITransient>();
-      var transientTwo = DependenciesProvider.GetService<ITransient>();
-      var singletonOne = DependenciesProvider.GetService<ISingleton>();
-      var singletonTwo = DependenciesProvider.GetService<ISingleton>();
-      var injected = DependenciesProvider.GetService<InjectedClass>();
-      var invalid = DependenciesProvider.GetService<IClass>();
+      var scopedOne = _factory.GetService<IClassScoped>();
+      var scopedTwo = _factory.GetService<IClassScoped>();
+      var transientOne = _factory.GetService<ITransient>();
+      var transientTwo = _factory.GetService<ITransient>();
+      var singletonOne = _factory.GetService<ISingleton>();
+      var singletonTwo = _factory.GetService<ISingleton>();
+      var injected = _factory.GetService<InjectedClass>();
+      var invalid = _factory.GetService<IClass>();
 
       Assert.IsNotNull(scopedOne);
       Assert.IsNotNull(scopedTwo);
@@ -83,10 +85,10 @@ namespace Estellaris.Tests {
 
     [TestMethod]
     public void TestConfigs() {
-      var scopedOne = DependenciesProvider.GetService<IClassScoped>();
+      var scopedOne = _factory.GetService<IClassScoped>();
       var intArray = new [] { 1, 2, 3 };
       var strArray = new [] { "Value1", "Value2" };
-      var model = DependenciesProvider.GetService<IOptions<MyOptions>>().Value;
+      var model = _factory.GetService<IOptions<MyOptions>>().Value;
 
       Assert.AreEqual(10, model.IntValue);
       Assert.IsTrue(model.BoolValue);
@@ -102,6 +104,11 @@ namespace Estellaris.Tests {
       Assert.AreEqual("Lorem", model.MySubOptions.Option1);
       Assert.AreEqual("Ipsum", model.MySubOptions.Option2);
       Assert.IsNull(model.MySubOptions.Option3);
+    }
+
+    [TestCleanup]
+    public void CleanUp() {
+      _factory.Dispose();
     }
   }
 }
