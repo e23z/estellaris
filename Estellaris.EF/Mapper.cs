@@ -9,11 +9,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Estellaris.EF {
   public static class Mapper {
+    static readonly ICollection<Assembly> _loadedAssemblies = new Collection<Assembly>();
     static readonly ICollection<MappingInfo> _mappings = new Collection<MappingInfo>();
 
     public static void RegisterAllFromAssembly(Assembly assembly, ModelBuilder modelBuilder) {
-      if (_mappings.IsEmpty())
+      if (!_loadedAssemblies.Contains(assembly)) {
         LoadMappingsFromAssembly(assembly, modelBuilder);
+        _loadedAssemblies.Add(assembly);
+      }
 
       foreach(var mapInfo in _mappings)
         mapInfo.Method.Invoke(mapInfo.Map, new [] { mapInfo.Entity });
