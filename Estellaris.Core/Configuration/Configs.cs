@@ -73,9 +73,7 @@ namespace Estellaris.Core {
     public static T BindTo<T>(string key) {
       CheckConfiguration();
       var model = Activator.CreateInstance<T>();
-      var properties = typeof (T).GetProperties().ToList();
-      var section = Configuration.GetSection(key);
-      FillUpProperties(model, properties, section);
+      Configuration.GetSection(key).Bind(model);
       return model;
     }
 
@@ -87,38 +85,6 @@ namespace Estellaris.Core {
         .GetChildren()
         .Select(_ =>(T) Convert.ChangeType(_.Value, typeof (T)))
         .ToList();
-    }
-
-    static object GetGenericArrayOfElements(IConfiguration section, Type type) {
-      var method = typeof (Configs).GetMethod("GetArrayOfElements", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(type);
-      return method.Invoke(null, new [] { section });
-    }
-
-    static void FillUpProperties(object model, IEnumerable<PropertyInfo> properties, IConfigurationSection section) {
-      foreach(var property in properties) {
-        var value = section.GetSection(property.Name).Value;
-        if (!property.PropertyType.FullName.StartsWith("System.")) {
-          var subSection = section.GetSection(property.Name);
-          var subProperties = property.PropertyType.GetProperties().ToList();
-          var subModel = Activator.CreateInstance(property.PropertyType);
-          property.SetValue(model, subModel);
-          FillUpProperties(subModel, subProperties, subSection);
-        } else if (property.PropertyType.FullName.EndsWith("[]")) {
-          var type = Type.GetType(property.PropertyType.FullName.Replace("[]", ""));
-          var array = GetGenericArrayOfElements(section.GetSection(property.Name), type);
-          var toArray = array.GetType().GetMethod("ToArray");
-          property.SetValue(model, toArray.Invoke(array, null));
-        } else if (property.PropertyType.FullName.Contains(".Generic")) {
-          var type = property.PropertyType.GenericTypeArguments.First();
-          var array = GetGenericArrayOfElements(section.GetSection(property.Name), type);
-          property.SetValue(model, array);
-        } else {
-          object convertedValue = null;
-          if (!string.IsNullOrWhiteSpace(value))
-            convertedValue = Convert.ChangeType(value, property.PropertyType);
-          property.SetValue(model, convertedValue);
-        }
-      }
     }
 
     public static void Dispose() {

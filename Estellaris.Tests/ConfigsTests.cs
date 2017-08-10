@@ -170,7 +170,7 @@ namespace Estellaris.Tests {
     }
 
     [TestMethod]
-    public void Test() {
+    public void TestBinding() {
       var intArray = new [] { 1, 2, 3 };
       var strArray = new [] { "Value1", "Value2" };
       var model = Configs.BindTo<MyOptions>("MyOptions");
