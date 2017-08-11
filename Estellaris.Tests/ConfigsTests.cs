@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -188,6 +189,17 @@ namespace Estellaris.Tests {
       Assert.AreEqual(model.MySubOptions.Option1, "Lorem");
       Assert.AreEqual(model.MySubOptions.Option2, "Ipsum");
       Assert.IsNull(model.MySubOptions.Option3);
+    }
+
+    [TestMethod]
+    public void TestCulture() {
+      Assert.AreEqual("iv", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+      Assert.IsNull(CultureInfo.DefaultThreadCurrentCulture);
+      Configs.SetGlobalCulture(new CultureInfo("pt-BR"));
+      Assert.IsNotNull(CultureInfo.DefaultThreadCurrentCulture);
+      Assert.AreEqual("pt", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+      Assert.AreEqual("pt", CultureInfo.DefaultThreadCurrentCulture.TwoLetterISOLanguageName);
+      Configs.SetGlobalCulture(new CultureInfo("iv"));
     }
   }
 }

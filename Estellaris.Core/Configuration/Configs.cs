@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -95,6 +96,13 @@ namespace Estellaris.Core {
     static void CheckConfiguration() {
       if (Configuration == null)
         Init();
+    }
+
+    public static void SetGlobalCulture(CultureInfo culture) {
+      if (culture == null)
+        culture = (CultureInfo) CultureInfo.CurrentCulture.Clone();
+      CultureInfo.DefaultThreadCurrentCulture = culture;
+      CultureInfo.DefaultThreadCurrentUICulture = culture;
     }
   }
 }
