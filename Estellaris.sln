@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estellaris.EF", "Estellaris
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estellaris.Terminal", "Estellaris.Terminal\Estellaris.Terminal.csproj", "{049B3355-DA1B-43D2-B0BE-B1245603F970}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estellaris.Web", "Estellaris.Web\Estellaris.Web.csproj", "{458F786F-2E13-404E-9566-E626E261F5F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,5 +39,9 @@ Global
 		{049B3355-DA1B-43D2-B0BE-B1245603F970}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{049B3355-DA1B-43D2-B0BE-B1245603F970}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{049B3355-DA1B-43D2-B0BE-B1245603F970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{458F786F-2E13-404E-9566-E626E261F5F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{458F786F-2E13-404E-9566-E626E261F5F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{458F786F-2E13-404E-9566-E626E261F5F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{458F786F-2E13-404E-9566-E626E261F5F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
