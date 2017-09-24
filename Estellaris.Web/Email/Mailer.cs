@@ -38,6 +38,22 @@ namespace Estellaris.Web.Email {
       catch { return false; }
     }
 
+    public bool SendPlain(IEnumerable<string> to, string from, string subject, string body) {
+      return SendMail(to, from, subject, body, MailType.PlainText);
+    }
+    
+    public bool SendPlain(string to, string from, string subject, string body) {
+      return SendMail(new [] { to }, from, subject, body, MailType.PlainText);
+    }
+    
+    public bool SendHtml(IEnumerable<string> to, string from, string subject, string body) {
+      return SendMail(to, from, subject, body, MailType.Html);
+    }
+    
+    public bool SendHtml(string to, string from, string subject, string body) {
+      return SendMail(new [] { to }, from, subject, body, MailType.Html);
+    }
+
     string GetSubtype(MailType type) {
       switch (type) {
         case MailType.Html:
