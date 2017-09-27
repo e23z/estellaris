@@ -63,7 +63,7 @@ namespace Estellaris.Tests.Utils {
 
         var client = await _listener.AcceptTcpClientAsync();
 
-        Write(client, "220 localhost -- Selfish Smtp Server");
+        Write(client, "220 localhost -- Smtp Server");
 
         while (true) {
           try {
